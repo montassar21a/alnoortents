@@ -11,7 +11,15 @@ const adminAuthRouter = router({
   verifyPassword: publicProcedure
     .input(z.object({ password: z.string() }))
     .mutation(async ({ input }) => {
-      const settings = await db.getAdminSettings();
+      let settings;
+      try {
+        settings = await db.getAdminSettings();
+      } catch (e: any) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `DB Error: ${e.message}`,
+        });
+      }
       if (!settings) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
