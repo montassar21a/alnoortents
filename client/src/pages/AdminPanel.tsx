@@ -82,6 +82,7 @@ export default function AdminPanel() {
                 <Input
                   type="password"
                   placeholder="Admin Password"
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="bg-slate-700 border-slate-600 text-white placeholder-slate-400"
