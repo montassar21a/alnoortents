@@ -1,0 +1,315 @@
+import { eq, desc } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/mysql2";
+import { InsertUser, users, adminSettings, testimonials, inquiries, notifications, statistics, menuItems, heroSection, pageContent } from "../drizzle/schema";
+import { ENV } from './_core/env';
+
+let _db: ReturnType<typeof drizzle> | null = null;
+
+// Lazily create the drizzle instance so local tooling can run without a DB.
+export async function getDb() {
+  if (!_db && process.env.DATABASE_URL) {
+    try {
+      _db = drizzle(process.env.DATABASE_URL);
+    } catch (error) {
+      console.warn("[Database] Failed to connect:", error);
+      _db = null;
+    }
+  }
+  return _db;
+}
+
+export async function upsertUser(user: InsertUser): Promise<void> {
+  if (!user.openId) {
+    throw new Error("User openId is required for upsert");
+  }
+
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot upsert user: database not available");
+    return;
+  }
+
+  try {
+    const values: InsertUser = {
+      openId: user.openId,
+    };
+    const updateSet: Record<string, unknown> = {};
+
+    const textFields = ["name", "email", "loginMethod"] as const;
+    type TextField = (typeof textFields)[number];
+
+    const assignNullable = (field: TextField) => {
+      const value = user[field];
+      if (value === undefined) return;
+      const normalized = value ?? null;
+      values[field] = normalized;
+      updateSet[field] = normalized;
+    };
+
+    textFields.forEach(assignNullable);
+
+    if (user.lastSignedIn !== undefined) {
+      values.lastSignedIn = user.lastSignedIn;
+      updateSet.lastSignedIn = user.lastSignedIn;
+    }
+    if (user.role !== undefined) {
+      values.role = user.role;
+      updateSet.role = user.role;
+    } else if (user.openId === ENV.ownerOpenId) {
+      values.role = 'admin';
+      updateSet.role = 'admin';
+    }
+
+    if (!values.lastSignedIn) {
+      values.lastSignedIn = new Date();
+    }
+
+    if (Object.keys(updateSet).length === 0) {
+      updateSet.lastSignedIn = new Date();
+    }
+
+    await db.insert(users).values(values).onDuplicateKeyUpdate({
+      set: updateSet,
+    });
+  } catch (error) {
+    console.error("[Database] Failed to upsert user:", error);
+    throw error;
+  }
+}
+
+export async function getUserByOpenId(openId: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get user: database not available");
+    return undefined;
+  }
+
+  const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
+// ============================================================
+// ADMIN SETTINGS
+// ============================================================
+
+export async function getAdminSettings() {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(adminSettings).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function updateAdminSettings(data: Partial<typeof adminSettings.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return null;
+  const existing = await getAdminSettings();
+  if (existing) {
+    return await db.update(adminSettings).set(data).where(eq(adminSettings.id, existing.id));
+  } else {
+    return await db.insert(adminSettings).values(data as any);
+  }
+}
+
+// ============================================================
+// TESTIMONIALS
+// ============================================================
+
+export async function getTestimonials() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(testimonials).where(eq(testimonials.isVisible, true)).orderBy(testimonials.order);
+}
+
+export async function getAllTestimonials() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(testimonials).orderBy(testimonials.order);
+}
+
+export async function createTestimonial(data: typeof testimonials.$inferInsert) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.insert(testimonials).values(data);
+}
+
+export async function updateTestimonial(id: number, data: Partial<typeof testimonials.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.update(testimonials).set(data).where(eq(testimonials.id, id));
+}
+
+export async function deleteTestimonial(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.delete(testimonials).where(eq(testimonials.id, id));
+}
+
+// ============================================================
+// INQUIRIES
+// ============================================================
+
+export async function createInquiry(data: typeof inquiries.$inferInsert) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.insert(inquiries).values(data);
+}
+
+export async function getInquiries() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(inquiries).orderBy(desc(inquiries.createdAt));
+}
+
+export async function getInquiry(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(inquiries).where(eq(inquiries.id, id));
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function updateInquiry(id: number, data: Partial<typeof inquiries.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.update(inquiries).set(data).where(eq(inquiries.id, id));
+}
+
+export async function deleteInquiry(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.delete(inquiries).where(eq(inquiries.id, id));
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+
+export async function createNotification(data: typeof notifications.$inferInsert) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.insert(notifications).values(data);
+}
+
+export async function getNotifications(limit: number = 50) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(notifications).orderBy(desc(notifications.createdAt)).limit(limit);
+}
+
+export async function markNotificationAsRead(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.update(notifications).set({ isRead: true }).where(eq(notifications.id, id));
+}
+
+export async function deleteNotification(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.delete(notifications).where(eq(notifications.id, id));
+}
+
+// ============================================================
+// STATISTICS
+// ============================================================
+
+export async function getStatistics() {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(statistics).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function updateStatistics(data: Partial<typeof statistics.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return null;
+  const existing = await getStatistics();
+  if (existing) {
+    return await db.update(statistics).set(data).where(eq(statistics.id, existing.id));
+  } else {
+    return await db.insert(statistics).values(data as any);
+  }
+}
+
+// ============================================================
+// MENU ITEMS
+// ============================================================
+
+export async function getMenuItems() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(menuItems).where(eq(menuItems.isVisible, true)).orderBy(menuItems.order);
+}
+
+export async function getAllMenuItems() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(menuItems).orderBy(menuItems.order);
+}
+
+export async function updateMenuItemOrder(id: number, order: number) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.update(menuItems).set({ order }).where(eq(menuItems.id, id));
+}
+
+export async function createMenuItem(data: typeof menuItems.$inferInsert) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.insert(menuItems).values(data);
+}
+
+export async function updateMenuItem(id: number, data: Partial<typeof menuItems.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.update(menuItems).set(data).where(eq(menuItems.id, id));
+}
+
+export async function deleteMenuItem(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.delete(menuItems).where(eq(menuItems.id, id));
+}
+
+// ============================================================
+// HERO SECTION
+// ============================================================
+
+export async function getHeroSection() {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(heroSection).limit(1);
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function updateHeroSection(data: Partial<typeof heroSection.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return null;
+  const existing = await getHeroSection();
+  if (existing) {
+    return await db.update(heroSection).set(data).where(eq(heroSection.id, existing.id));
+  } else {
+    return await db.insert(heroSection).values(data as any);
+  }
+}
+
+// ============================================================
+// PAGE CONTENT
+// ============================================================
+
+export async function getPageContent(sectionKey: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(pageContent).where(eq(pageContent.sectionKey, sectionKey));
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function updatePageContent(sectionKey: string, data: Partial<typeof pageContent.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return null;
+  const existing = await getPageContent(sectionKey);
+  if (existing) {
+    return await db.update(pageContent).set(data).where(eq(pageContent.id, existing.id));
+  } else {
+    return await db.insert(pageContent).values({ sectionKey, ...data } as any);
+  }
+}
