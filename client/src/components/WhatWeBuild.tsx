@@ -10,10 +10,13 @@ const WEDDING_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/
 const RAMADAN_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/jtD7vMJSJN7HQvsfcDy4th/ramadan-majlis-MgNdmkbDPGGvPWNjMEEKhF.webp";
 const HERO_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/jtD7vMJSJN7HQvsfcDy4th/hero-main-5xCAP7fo2MqgtdUHktAwG6.webp";
 
+import { trpc } from "@/lib/trpc";
+
 export default function WhatWeBuild() {
   const { t, lang } = useLanguage();
+  const { data: cms } = trpc.admin.content.get.useQuery({ sectionKey: "what-we-build" });
 
-  const tents = [
+  let tents = [
     {
       id: "arch-tents",
       titleKey: "build.arch.title",
@@ -40,6 +43,18 @@ export default function WhatWeBuild() {
     },
   ];
 
+  if (cms?.contentEn) {
+    try {
+      const parsed = JSON.parse(cms.contentEn);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        tents = parsed.map((p, i) => ({
+          ...tents[i],
+          ...p,
+        }));
+      }
+    } catch(e) {}
+  }
+
   return (
     <section
       id="what-we-build"
@@ -61,7 +76,7 @@ export default function WhatWeBuild() {
               lineHeight: 1.1,
             }}
           >
-            {t("build.title")}
+            {cms?.title || t("build.title")}
           </h2>
           <p
             className="text-white/55 max-w-2xl"
@@ -72,18 +87,18 @@ export default function WhatWeBuild() {
               fontWeight: 300,
             }}
           >
-            {t("build.subtitle")}
+            {cms?.description || t("build.subtitle")}
           </p>
         </div>
 
         {/* Tent cards grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {tents.map((tent, i) => (
+          {tents.map((tent: any, i) => (
             <TentCard
               key={tent.id}
               id={tent.id}
-              title={t(tent.titleKey)}
-              desc={t(tent.descKey)}
+              title={tent.title || t(tent.titleKey)}
+              desc={tent.desc || t(tent.descKey)}
               image={tent.image}
               index={i}
               lang={lang}

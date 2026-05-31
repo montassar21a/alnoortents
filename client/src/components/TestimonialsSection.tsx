@@ -35,12 +35,42 @@ const testimonials = [
     name: "Lucas Fernandez",
     role: "Festival Organizer, Riyadh",
     text: "The industrial-grade quality combined with the luxury finish is what sets Al Noor apart. We've used their tents for outdoor festivals in extreme heat and they performed flawlessly every single time.",
-    textAr: "الجودة الصناعية مع اللمسة الفاخرة هو ما يميز خيام النور. استخدمنا خيامهم في مهرجانات خارجية في حر شديد وأدّت أداءً مثالياً في كل مرة.",
-  },
+  }
 ];
+
+import { trpc } from "@/lib/trpc";
 
 export default function TestimonialsSection() {
   const { t, lang } = useLanguage();
+  const { data: cms } = trpc.admin.content.get.useQuery({ sectionKey: "testimonials" });
+  
+  // Real testimonials from the database
+  const { data: dbTestimonials = [] } = trpc.admin.testimonials.list.useQuery();
+
+  // Combine static and dynamic
+  const testimonials = dbTestimonials.length > 0 
+    ? dbTestimonials.filter(t => t.isVisible)
+    : [
+        {
+          text: "Al Noor Tents delivered an incredible structure for our royal wedding. The arch design was flawless and the team was highly professional.",
+          textAr: "قدمت خيام النور هيكلًا مذهلًا لحفل زفافنا الملكي. كان تصميم القوس لا تشوبه شائبة وكان الفريق محترفًا للغاية.",
+          name: "Ahmed Al Maktoum",
+          role: "Event Organizer, Dubai",
+        },
+        {
+          text: "Their geodesic domes completely transformed our glamping resort. Durable, beautiful, and installed in record time.",
+          textAr: "لقد غيرت قبابهم الجيوديسية منتجع التخييم الخاص بنا تمامًا. متينة وجميلة وتم تركيبها في وقت قياسي.",
+          name: "Sarah Jones",
+          role: "Resort Manager, Oman",
+        },
+        {
+          text: "The Ramadan majlis they built for our hotel was the talk of the season. Authentic feel with modern engineering.",
+          textAr: "كان مجلس رمضان الذي بنوه لفندقنا حديث الموسم. شعور أصيل مع هندسة حديثة.",
+          name: "Mohammed Al Qahtani",
+          role: "Director of Operations, Riyadh",
+        },
+      ];
+
   const [current, setCurrent] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -62,16 +92,16 @@ export default function TestimonialsSection() {
   const testimonial = testimonials[current];
 
   return (
-    <section
-      className="py-24 md:py-32"
-      style={{ background: "oklch(0.12 0.012 60)" }}
-    >
-      <div className="container">
+    <section className="py-24 md:py-32 bg-slate-50 relative overflow-hidden" style={{ background: "oklch(0.97 0.01 70)" }}>
+      <div className="absolute top-0 right-0 w-1/3 h-full opacity-5 pointer-events-none" style={{ background: "radial-gradient(circle at center, oklch(0.1 0.02 60) 0%, transparent 70%)" }} />
+
+      <div className="container relative z-10">
+        
         {/* Header */}
-        <div className="mb-16 reveal text-center">
-          <div className="section-label justify-center">{t("testimonials.label")}</div>
+        <div className="text-center max-w-3xl mx-auto mb-16 reveal">
+          <div className="section-label mx-auto text-[oklch(0.4_0.05_60)]">{t("testimonials.label")}</div>
           <h2
-            className="text-white"
+            className="mb-4 text-[oklch(0.1_0.02_60)]"
             style={{
               fontFamily: lang === "ar" ? "'Amiri', serif" : "'Cormorant Garamond', serif",
               fontSize: "clamp(2rem, 5vw, 3.5rem)",

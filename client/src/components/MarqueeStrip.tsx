@@ -3,8 +3,9 @@
    Scrolling gold text ticker between hero and content
    ============================================================ */
 import { useLanguage } from "@/contexts/LanguageContext";
+import { trpc } from "@/lib/trpc";
 
-const items = [
+const defaultItemsEn = [
   "ARCH TENTS",
   "DOME TENTS",
   "WEDDING TENTS",
@@ -15,7 +16,7 @@ const items = [
   "EVENT STRUCTURES",
 ];
 
-const itemsAr = [
+const defaultItemsAr = [
   "خيام القوس",
   "خيام القبة",
   "خيام الأفراح",
@@ -43,8 +44,20 @@ const StarDivider = () => (
 
 export default function MarqueeStrip() {
   const { lang } = useLanguage();
-  const list = lang === "ar" ? itemsAr : items;
+  const { data: cms } = trpc.admin.content.get.useQuery({ sectionKey: "marquee" });
 
+  const getList = () => {
+    if (lang === "ar") {
+      if (cms?.contentAr) return cms.contentAr.split(",").map(s => s.trim());
+      return defaultItemsAr;
+    } else {
+      if (cms?.contentEn) return cms.contentEn.split(",").map(s => s.trim());
+      return defaultItemsEn;
+    }
+  };
+
+  const list = getList();
+  
   // Duplicate for seamless loop
   const doubled = [...list, ...list, ...list];
 

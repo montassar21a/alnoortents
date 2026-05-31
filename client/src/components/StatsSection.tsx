@@ -4,6 +4,7 @@
    ============================================================ */
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { trpc } from "@/lib/trpc";
 
 const stats = [
   { value: 200, suffix: "+", labelKey: "stats.projects" },
@@ -68,6 +69,8 @@ export default function StatsSection() {
   const { t, lang } = useLanguage();
   const ref = useRef<HTMLDivElement>(null);
   const [started, setStarted] = useState(false);
+  
+  const { data: cms } = trpc.admin.content.get.useQuery({ sectionKey: "stats" });
 
   useEffect(() => {
     const el = ref.current;
@@ -103,8 +106,13 @@ export default function StatsSection() {
               textTransform: "uppercase",
             }}
           >
-            {t("stats.title")}
+            {cms?.title || t("stats.title")}
           </h2>
+          {cms?.description && (
+            <p className="text-white/50 mt-4 text-sm" style={{ fontFamily: lang === "ar" ? "'Noto Naskh Arabic', sans-serif" : "'DM Sans', sans-serif" }}>
+              {cms.description}
+            </p>
+          )}
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/8">
           {stats.map((stat) => (

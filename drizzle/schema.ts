@@ -32,6 +32,7 @@ export type InsertUser = typeof users.$inferInsert;
 export const adminSettings = mysqlTable("adminSettings", {
   id: int("id").autoincrement().primaryKey(),
   // Authentication
+  adminUsername: varchar("adminUsername", { length: 255 }).default("admin"),
   adminPassword: varchar("adminPassword", { length: 255 }).notNull(),
   // Website Identity
   websiteTitle: varchar("websiteTitle", { length: 255 }).default("Al Noor Tents"),
@@ -52,9 +53,18 @@ export const adminSettings = mysqlTable("adminSettings", {
   mapLatitude: decimal("mapLatitude", { precision: 10, scale: 8 }),
   mapLongitude: decimal("mapLongitude", { precision: 11, scale: 8 }),
   mapZoom: int("mapZoom").default(13),
+  // Cookie Banner
+  enableCookieBanner: boolean("enableCookieBanner").default(true),
+  cookieBannerTextEn: text("cookieBannerTextEn").default("We use cookies to improve your experience on our website. By browsing this website, you agree to our use of cookies."),
+  cookieBannerTextAr: text("cookieBannerTextAr").default("نحن نستخدم ملفات تعريف الارتباط لتحسين تجربتك على موقعنا. من خلال تصفح هذا الموقع، فإنك توافق على استخدامنا لملفات تعريف الارتباط."),
   // Email Notifications
   notificationEmail: varchar("notificationEmail", { length: 255 }),
   enableEmailNotifications: boolean("enableEmailNotifications").default(true),
+  // SMTP Settings
+  smtpHost: varchar("smtpHost", { length: 255 }),
+  smtpPort: int("smtpPort").default(465),
+  smtpUser: varchar("smtpUser", { length: 255 }),
+  smtpPass: varchar("smtpPass", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

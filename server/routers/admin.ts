@@ -2,6 +2,7 @@ import { z } from "zod";
 import { publicProcedure, router } from "../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import * as db from "../db";
+import nodemailer from "nodemailer";
 
 // ============================================================
 // ADMIN AUTHENTICATION
@@ -9,7 +10,7 @@ import * as db from "../db";
 
 const adminAuthRouter = router({
   verifyPassword: publicProcedure
-    .input(z.object({ password: z.string() }))
+    .input(z.object({ username: z.string(), password: z.string() }))
     .mutation(async ({ input }) => {
       let settings;
       try {
@@ -28,13 +29,13 @@ const adminAuthRouter = router({
         });
       }
       
-      // Simple password comparison (in production, use bcrypt)
-      const isValid = input.password === settings.adminPassword;
+      const isUsernameValid = input.username === (settings.adminUsername || "admin");
+      const isPasswordValid = input.password === settings.adminPassword;
       
-      if (!isValid) {
+      if (!isUsernameValid || !isPasswordValid) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: `Invalid admin password (Database has: '${settings.adminPassword}', You typed: '${input.password}')`,
+          message: `Invalid admin credentials`,
         });
       }
       
@@ -54,6 +55,7 @@ const settingsRouter = router({
   update: publicProcedure
     .input(
       z.object({
+        adminUsername: z.string().optional(),
         adminPassword: z.string().optional(),
         websiteTitle: z.string().optional(),
         logoUrl: z.string().optional(),
@@ -71,6 +73,13 @@ const settingsRouter = router({
         mapZoom: z.number().optional(),
         notificationEmail: z.string().optional(),
         enableEmailNotifications: z.boolean().optional(),
+        enableCookieBanner: z.boolean().optional(),
+        cookieBannerTextEn: z.string().optional(),
+        cookieBannerTextAr: z.string().optional(),
+        smtpHost: z.string().optional(),
+        smtpPort: z.number().optional(),
+        smtpUser: z.string().optional(),
+        smtpPass: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
@@ -170,6 +179,31 @@ const inquiriesRouter = router({
         message: `New inquiry from ${input.fullName}`,
         type: "inquiry",
       });
+
+      // Send email notification if configured
+      try {
+        const settings = await db.getAdminSettings();
+        if (settings?.enableEmailNotifications && settings?.notificationEmail && settings?.smtpHost && settings?.smtpUser && settings?.smtpPass) {
+          const transporter = nodemailer.createTransport({
+            host: settings.smtpHost,
+            port: settings.smtpPort || 465,
+            secure: settings.smtpPort === 465,
+            auth: {
+              user: settings.smtpUser,
+              pass: settings.smtpPass,
+            },
+          });
+          
+          await transporter.sendMail({
+            from: `"${settings.websiteTitle || 'Website'}" <${settings.smtpUser}>`,
+            to: settings.notificationEmail,
+            subject: `New Inquiry from ${input.fullName}`,
+            text: `You have received a new inquiry on your website.\n\nName: ${input.fullName}\nEmail: ${input.email}\nPhone: ${input.phone}\nDetails: ${input.projectDetails || 'N/A'}\n\nLogin to the dashboard to view more details.`,
+          });
+        }
+      } catch (err) {
+        console.error("Failed to send email notification:", err);
+      }
 
       return inquiry;
     }),

@@ -10,14 +10,19 @@ const HERO_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/jtD
 const PHONE_NUMBER = "+97433555918";
 const WHATSAPP_URL = "https://wa.me/97433555918";
 
+import { trpc } from "@/lib/trpc";
+
 export default function HeroSection() {
   const { t, lang } = useLanguage();
+  const { data: cms } = trpc.admin.content.get.useQuery({ sectionKey: "hero" });
 
   const scrollToTents = () => {
     document.querySelector("#what-we-build")?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const titleLines = t("hero.title").split("\n");
+  const rawTitle = cms?.title || t("hero.title");
+  const titleLines = rawTitle.split("\n");
+  const subtitle = cms?.description || t("hero.subtitle");
 
   return (
     <section
@@ -93,7 +98,7 @@ export default function HeroSection() {
             animation: "fadeInUp 900ms cubic-bezier(0.23,1,0.32,1) 500ms both",
           }}
         >
-          {t("hero.subtitle")}
+          {subtitle}
         </p>
 
         {/* CTAs */}

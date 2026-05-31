@@ -4,6 +4,7 @@
    ============================================================ */
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { trpc } from "@/lib/trpc";
 
 const HERO_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/jtD7vMJSJN7HQvsfcDy4th/hero-main-5xCAP7fo2MqgtdUHktAwG6.webp";
 const DOME_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/jtD7vMJSJN7HQvsfcDy4th/dome-luxury-3tjemozAA48AZ69g5YjGz9.webp";
@@ -56,6 +57,7 @@ const projectData: Record<string, { image: string; label: string }[]> = {
 export default function ProjectsSection() {
   const { t, lang } = useLanguage();
   const [activeTab, setActiveTab] = useState("government");
+  const { data: cms } = trpc.admin.content.get.useQuery({ sectionKey: "projects" });
 
   const tabs = [
     { key: "government", labelKey: "projects.tab.government" },
@@ -88,7 +90,7 @@ export default function ProjectsSection() {
               textTransform: "uppercase",
             }}
           >
-            {t("projects.title")}
+            {cms?.title || t("projects.title")}
           </h2>
           <p
             className="text-white/55"
@@ -99,7 +101,7 @@ export default function ProjectsSection() {
               fontWeight: 300,
             }}
           >
-            {t("projects.subtitle")}
+            {cms?.description || t("projects.subtitle")}
           </p>
         </div>
 

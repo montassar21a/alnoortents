@@ -120,15 +120,7 @@ export default function Navbar() {
                 </a>
               </div>
 
-              {/* Admin button */}
-              <button
-                onClick={() => navigate("/admin")}
-                className="text-white/70 hover:text-[oklch(0.72_0.12_75)] transition-colors p-2"
-                title="Admin Panel"
-                aria-label="Admin Panel"
-              >
-                <Settings size={18} strokeWidth={1.5} />
-              </button>
+
 
               {/* Language switcher */}
               <button

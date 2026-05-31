@@ -3,8 +3,9 @@
    6 sector cards with icons and descriptions
    ============================================================ */
 import { useLanguage } from "@/contexts/LanguageContext";
+import { trpc } from "@/lib/trpc";
 
-const WHATSAPP_URL = "https://wa.me/971500000000";
+const WHATSAPP_URL = "https://wa.me/97433555918";
 
 const sectors = [
   {
@@ -69,6 +70,7 @@ const sectors = [
 
 export default function WhoWeWorkWith() {
   const { t, lang } = useLanguage();
+  const { data: cms } = trpc.admin.content.get.useQuery({ sectionKey: "clients" });
 
   return (
     <section
@@ -90,7 +92,7 @@ export default function WhoWeWorkWith() {
               textTransform: "uppercase",
             }}
           >
-            {t("who.title")}
+            {cms?.title || t("who.title")}
           </h2>
           <p
             className="text-white/55"
@@ -101,7 +103,7 @@ export default function WhoWeWorkWith() {
               fontWeight: 300,
             }}
           >
-            {t("who.subtitle")}
+            {cms?.description || t("who.subtitle")}
           </p>
         </div>
 

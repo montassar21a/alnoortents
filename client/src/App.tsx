@@ -7,20 +7,20 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { AdminProvider } from "./contexts/AdminContext";
 import Home from "./pages/Home";
-import Admin from "./pages/Admin";
-import AdminPanel from "./pages/AdminPanel";
+import AdminPanel from "./pages/super/SuperPanel";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
-      <Route path={"/admin"} component={Admin} />
       <Route path={"/super"} component={AdminPanel} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>
   );
 }
+
+import CookieBanner from "./components/CookieBanner";
 
 function App() {
   return (
@@ -31,6 +31,7 @@ function App() {
             <TooltipProvider>
               <Toaster />
               <Router />
+              <CookieBanner />
             </TooltipProvider>
           </LanguageProvider>
         </AdminProvider>
