@@ -15,9 +15,10 @@ const adminAuthRouter = router({
       try {
         settings = await db.getAdminSettings();
       } catch (e: any) {
+        const errorDetail = e.cause?.message || e.message;
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: `DB Error: ${e.message}`,
+          message: `SQL Error: ${errorDetail} | Type: ${e.code || 'unknown'}`,
         });
       }
       if (!settings) {
