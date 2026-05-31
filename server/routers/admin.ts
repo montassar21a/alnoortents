@@ -25,7 +25,7 @@ const adminAuthRouter = router({
       if (!isValid) {
         throw new TRPCError({
           code: "UNAUTHORIZED",
-          message: "Invalid admin password",
+          message: `Invalid admin password (Database has: '${settings.adminPassword}', You typed: '${input.password}')`,
         });
       }
       

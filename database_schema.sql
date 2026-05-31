@@ -3,9 +3,7 @@
 -- Complete database setup for Al Noor Tents website
 -- ============================================================
 
--- Create database (if not exists)
-CREATE DATABASE IF NOT EXISTS u818263873_alnoortents;
-USE u818263873_alnoortents;
+
 
 -- ============================================================
 -- USERS TABLE (Authentication)
@@ -19,8 +17,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `role` enum('user','admin') NOT NULL DEFAULT 'user',
   `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `lastSignedIn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  KEY `openId` (`openId`)
+  `lastSignedIn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
@@ -175,8 +172,7 @@ CREATE TABLE IF NOT EXISTS `pageContent` (
   `title` varchar(255),
   `description` text,
   `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  KEY `sectionKey` (`sectionKey`)
+  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
