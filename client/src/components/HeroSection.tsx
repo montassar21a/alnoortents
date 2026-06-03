@@ -1,41 +1,40 @@
-/* ============================================================
-   AL NOOR TENTS — Hero Section
-   Full-screen cinematic tent image, dark overlay, 
-   large display title, two CTAs
-   ============================================================ */
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ChevronDown } from "lucide-react";
-
-const HERO_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/jtD7vMJSJN7HQvsfcDy4th/hero-main-5xCAP7fo2MqgtdUHktAwG6.webp";
-const PHONE_NUMBER = "+97433555918";
-const WHATSAPP_URL = "https://wa.me/97433555918";
-
 import { trpc } from "@/lib/trpc";
 
 export default function HeroSection() {
   const { t, lang } = useLanguage();
   const { data: cms } = trpc.admin.content.get.useQuery({ sectionKey: "hero" });
+  const { data: hero } = trpc.admin.hero.get.useQuery();
+  const { data: settings } = trpc.admin.settings.get.useQuery();
 
-  const scrollToTents = () => {
-    document.querySelector("#what-we-build")?.scrollIntoView({ behavior: "smooth" });
-  };
+  const bgImage = hero?.imageUrl || "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/jtD7vMJSJN7HQvsfcDy4th/hero-main-5xCAP7fo2MqgtdUHktAwG6.webp";
+  const phone = settings?.phone || "+97433555918";
+  const whatsappUrl = settings?.whatsapp || "https://wa.me/97433555918";
 
   const rawTitle = cms?.title || t("hero.title");
   const titleLines = rawTitle.split("\n");
   const subtitle = cms?.description || t("hero.subtitle");
+  const label = lang === "ar" ? (hero?.labelAr || t("hero.label")) : (hero?.labelEn || t("hero.label"));
+  const cta1 = lang === "ar" ? (hero?.cta1TextAr || t("hero.cta1")) : (hero?.cta1TextEn || t("hero.cta1"));
+  const cta2 = lang === "ar" ? (hero?.cta2TextAr || t("hero.cta2")) : (hero?.cta2TextEn || t("hero.cta2"));
+  const cta1Link = hero?.cta1Link || `tel:${phone}`;
+  const cta2Link = hero?.cta2Link || whatsappUrl;
+
+  const scrollToTents = () => {
+    document.querySelector("#what-we-build")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
     <section
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
       style={{ background: "oklch(0.08 0.012 60)" }}
     >
-      {/* Background image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${HERO_IMAGE})` }}
+        style={{ backgroundImage: `url(${bgImage})` }}
       />
 
-      {/* Dark overlay — gradient from top-dark to bottom-darker */}
       <div
         className="absolute inset-0"
         style={{
@@ -43,41 +42,31 @@ export default function HeroSection() {
         }}
       />
 
-      {/* Content */}
       <div className="relative z-10 container flex flex-col items-center text-center px-4">
-        {/* Label */}
         <div
           className="flex items-center gap-3 mb-6"
-          style={{
-            animation: "fadeInDown 800ms cubic-bezier(0.23,1,0.32,1) 200ms both",
-          }}
+          style={{ animation: "fadeInDown 800ms cubic-bezier(0.23,1,0.32,1) 200ms both" }}
         >
           <span style={{ width: "2rem", height: "1px", background: "oklch(0.72 0.12 75)", display: "block" }} />
           <span
             style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "0.65rem",
-              letterSpacing: "0.25em",
-              textTransform: "uppercase",
-              color: "oklch(0.72 0.12 75)",
-              fontWeight: 500,
+              fontFamily: "'DM Sans', sans-serif", fontSize: "0.65rem",
+              letterSpacing: "0.25em", textTransform: "uppercase",
+              color: "oklch(0.72 0.12 75)", fontWeight: 500,
             }}
           >
-            {t("hero.label")}
+            {label}
           </span>
           <span style={{ width: "2rem", height: "1px", background: "oklch(0.72 0.12 75)", display: "block" }} />
         </div>
 
-        {/* Main title */}
         <h1
           className="text-white mb-6"
           style={{
             fontFamily: lang === "ar" ? "'Amiri', serif" : "'Cormorant Garamond', serif",
-            fontSize: "clamp(2.8rem, 8vw, 7rem)",
-            fontWeight: 700,
+            fontSize: "clamp(2.8rem, 8vw, 7rem)", fontWeight: 700,
             letterSpacing: lang === "ar" ? "0.02em" : "0.08em",
-            textTransform: "uppercase",
-            lineHeight: 1.05,
+            textTransform: "uppercase", lineHeight: 1.05,
             animation: "fadeInUp 900ms cubic-bezier(0.23,1,0.32,1) 350ms both",
           }}
         >
@@ -86,36 +75,27 @@ export default function HeroSection() {
           ))}
         </h1>
 
-        {/* Subtitle */}
         <p
           className="text-white/70 mb-10 max-w-xl"
           style={{
             fontFamily: lang === "ar" ? "'Noto Naskh Arabic', sans-serif" : "'DM Sans', sans-serif",
-            fontSize: "clamp(0.9rem, 2vw, 1.05rem)",
-            fontWeight: 300,
-            lineHeight: 1.7,
-            letterSpacing: lang === "ar" ? "0" : "0.02em",
+            fontSize: "clamp(0.9rem, 2vw, 1.05rem)", fontWeight: 300,
+            lineHeight: 1.7, letterSpacing: lang === "ar" ? "0" : "0.02em",
             animation: "fadeInUp 900ms cubic-bezier(0.23,1,0.32,1) 500ms both",
           }}
         >
           {subtitle}
         </p>
 
-        {/* CTAs */}
         <div
           className="flex flex-wrap gap-4 justify-center"
           style={{ animation: "fadeInUp 900ms cubic-bezier(0.23,1,0.32,1) 650ms both" }}
         >
-          <a href={`tel:${PHONE_NUMBER}`} className="btn-gold">
-            {t("hero.cta1")}
-          </a>
-          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="btn-outline-gold">
-            {t("hero.cta2")}
-          </a>
+          <a href={cta1Link} className="btn-gold">{cta1}</a>
+          <a href={cta2Link} target="_blank" rel="noopener noreferrer" className="btn-outline-gold">{cta2}</a>
         </div>
       </div>
 
-      {/* Scroll indicator */}
       <button
         onClick={scrollToTents}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 text-white/40 hover:text-[oklch(0.72_0.12_75)] transition-colors"

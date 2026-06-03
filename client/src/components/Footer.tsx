@@ -21,6 +21,13 @@ export default function Footer() {
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
+  const socialLinks = [
+    { icon: Instagram, href: settings?.instagram || "#", label: "Instagram" },
+    { icon: Twitter, href: settings?.twitter || "#", label: "Twitter" },
+    { icon: Linkedin, href: settings?.linkedin || "#", label: "LinkedIn" },
+    { icon: Facebook, href: settings?.facebook || "#", label: "Facebook" },
+  ];
+
   return (
     <footer
       style={{
@@ -37,45 +44,34 @@ export default function Footer() {
                 className="font-display text-white tracking-widest uppercase mb-1"
                 style={{
                   fontFamily: lang === "ar" ? "'Amiri', serif" : "'Cormorant Garamond', serif",
-                  fontSize: "1.4rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.2em",
+                  fontSize: "1.4rem", fontWeight: 700, letterSpacing: "0.2em",
                 }}
               >
                 {settings?.websiteTitle || (lang === "ar" ? "خيام النور" : "AL NOOR TENTS")}
               </div>
-              <div
-                style={{
-                  width: "2.5rem",
-                  height: "1px",
-                  background: "oklch(0.72 0.12 75)",
-                  marginTop: "1rem",
-                }}
-              />
+              <div style={{ width: "2.5rem", height: "1px", background: "oklch(0.72 0.12 75)", marginTop: "1rem" }} />
             </div>
             <p
               className="text-white/50 mb-6 max-w-sm"
               style={{
                 fontFamily: lang === "ar" ? "'Noto Naskh Arabic', sans-serif" : "'DM Sans', sans-serif",
-                fontSize: "0.85rem",
-                lineHeight: 1.8,
+                fontSize: "0.85rem", lineHeight: 1.8,
               }}
             >
               {cms?.description || t("footer.tagline")}
             </p>
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:border-[oklch(0.72_0.12_75)] hover:text-[oklch(0.72_0.12_75)] transition-colors">
-                <Instagram size={16} />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:border-[oklch(0.72_0.12_75)] hover:text-[oklch(0.72_0.12_75)] transition-colors">
-                <Twitter size={16} />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:border-[oklch(0.72_0.12_75)] hover:text-[oklch(0.72_0.12_75)] transition-colors">
-                <Linkedin size={16} />
-              </a>
-              <a href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:border-[oklch(0.72_0.12_75)] hover:text-[oklch(0.72_0.12_75)] transition-colors">
-                <Facebook size={16} />
-              </a>
+              {socialLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:border-[oklch(0.72_0.12_75)] hover:text-[oklch(0.72_0.12_75)] transition-colors"
+                >
+                  <link.icon size={16} />
+                </a>
+              ))}
             </div>
           </div>
 
@@ -85,9 +81,7 @@ export default function Footer() {
               className="text-white mb-6 uppercase"
               style={{
                 fontFamily: lang === "ar" ? "'Noto Naskh Arabic', sans-serif" : "'DM Sans', sans-serif",
-                fontSize: "0.8rem",
-                fontWeight: 600,
-                letterSpacing: "0.1em",
+                fontSize: "0.8rem", fontWeight: 600, letterSpacing: "0.1em",
               }}
             >
               {t("footer.links")}
@@ -103,10 +97,7 @@ export default function Footer() {
                       fontSize: "0.85rem",
                     }}
                   >
-                    <ArrowUpRight
-                      size={14}
-                      className="mr-2 opacity-0 -translate-x-2 transition-all group-hover:opacity-100 group-hover:translate-x-0 text-[oklch(0.72_0.12_75)]"
-                    />
+                    <ArrowUpRight size={14} className="mr-2 opacity-0 -translate-x-2 transition-all group-hover:opacity-100 group-hover:translate-x-0 text-[oklch(0.72_0.12_75)]" />
                     {t(link.labelKey)}
                   </button>
                 </li>
@@ -120,9 +111,7 @@ export default function Footer() {
               className="text-white mb-6 uppercase"
               style={{
                 fontFamily: lang === "ar" ? "'Noto Naskh Arabic', sans-serif" : "'DM Sans', sans-serif",
-                fontSize: "0.8rem",
-                fontWeight: 600,
-                letterSpacing: "0.1em",
+                fontSize: "0.8rem", fontWeight: 600, letterSpacing: "0.1em",
               }}
             >
               {t("nav.contact")}
@@ -134,25 +123,19 @@ export default function Footer() {
                   className="text-white/50"
                   style={{
                     fontFamily: lang === "ar" ? "'Noto Naskh Arabic', sans-serif" : "'DM Sans', sans-serif",
-                    fontSize: "0.85rem",
-                    lineHeight: 1.6,
+                    fontSize: "0.85rem", lineHeight: 1.6,
                   }}
                 >
-                  Dubai Design District, Building 4
-                  <br />
-                  Dubai, United Arab Emirates
+                  {settings?.address || "Dubai Design District, Building 4<br/>Dubai, United Arab Emirates"}
                 </span>
               </li>
               <li className="flex items-center">
                 <Phone size={18} className="text-[oklch(0.72_0.12_75)] mr-3 shrink-0" />
                 <span
                   className="text-white/50"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "0.85rem",
-                  }}
+                  style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.85rem" }}
                 >
-                  +974 3355 5918
+                  {settings?.phone || "+974 3355 5918"}
                 </span>
               </li>
             </ul>
@@ -160,27 +143,12 @@ export default function Footer() {
         </div>
       </div>
 
-      <div
-        className="py-6 border-t"
-        style={{ borderColor: "oklch(1 0 0 / 6%)" }}
-      >
+      <div className="py-6 border-t" style={{ borderColor: "oklch(1 0 0 / 6%)" }}>
         <div className="container flex flex-col md:flex-row justify-between items-center gap-4">
-          <p
-            className="text-white/30"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "0.75rem",
-            }}
-          >
+          <p className="text-white/30" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.75rem" }}>
             © {new Date().getFullYear()} {settings?.websiteTitle || "Al Noor Tents"}. {t("footer.rights")}
           </p>
-          <div
-            className="flex gap-4 text-white/30"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "0.75rem",
-            }}
-          >
+          <div className="flex gap-4 text-white/30" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: "0.75rem" }}>
             <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
           </div>
