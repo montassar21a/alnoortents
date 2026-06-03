@@ -92,7 +92,7 @@ export default function TestimonialsSection() {
   const testimonial = testimonials[current];
 
   return (
-    <section className="py-24 md:py-32 bg-slate-50 relative overflow-hidden" style={{ background: "oklch(0.97 0.01 70)" }}>
+    <section className="py-24 md:py-32 relative overflow-hidden" style={{ background: "oklch(0.12 0.012 60)" }}>
       <div className="absolute top-0 right-0 w-1/3 h-full opacity-5 pointer-events-none" style={{ background: "radial-gradient(circle at center, oklch(0.1 0.02 60) 0%, transparent 70%)" }} />
 
       <div className="container relative z-10">
