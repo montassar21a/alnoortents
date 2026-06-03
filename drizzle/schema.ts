@@ -329,3 +329,19 @@ export const pageSections = mysqlTable("pageSections", {
 export type PageSection = typeof pageSections.$inferSelect;
 export type InsertPageSection = typeof pageSections.$inferInsert;
 
+// ============================================================
+// DYNAMIC SECTION SCHEMAS (CMS CONFIG)
+// ============================================================
+
+export const sectionSchemas = mysqlTable("sectionSchemas", {
+  id: int("id").autoincrement().primaryKey(),
+  sectionType: varchar("sectionType", { length: 255 }).unique().notNull(),
+  schema: json("schema").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SectionSchema = typeof sectionSchemas.$inferSelect;
+export type InsertSectionSchema = typeof sectionSchemas.$inferInsert;
+
+

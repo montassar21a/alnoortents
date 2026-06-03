@@ -1,6 +1,6 @@
 import { eq, desc, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, adminSettings, testimonials, inquiries, notifications, statistics, menuItems, heroSection, pageContent, products, features, projects, sectors, pageSections } from "../drizzle/schema";
+import { InsertUser, users, adminSettings, testimonials, inquiries, notifications, statistics, menuItems, heroSection, pageContent, products, features, projects, sectors, pageSections, sectionSchemas } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -501,4 +501,26 @@ export async function deletePageSection(id: number) {
   const db = await getDb();
   if (!db) return null;
   return await db.delete(pageSections).where(eq(pageSections.id, id));
+}
+
+// ============================================================
+// SECTION SCHEMAS
+// ============================================================
+export async function getSectionSchema(sectionType: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(sectionSchemas).where(eq(sectionSchemas.sectionType, sectionType));
+  return result.length > 0 ? result[0] : null;
+}
+
+export async function createSectionSchema(data: typeof sectionSchemas.$inferInsert) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.insert(sectionSchemas).values(data);
+}
+
+export async function updateSectionSchema(sectionType: string, schema: any) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.update(sectionSchemas).set({ schema }).where(eq(sectionSchemas.sectionType, sectionType));
 }

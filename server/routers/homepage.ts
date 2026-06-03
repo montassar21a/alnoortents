@@ -43,4 +43,31 @@ export const homepageRouter = router({
     .mutation(async ({ input }) => {
       return await db.deletePageSection(input.id);
     }),
+
+  getSectionSchema: publicProcedure
+    .input(z.string())
+    .query(async ({ input }) => {
+      return await db.getSectionSchema(input);
+    }),
+
+  createSectionSchema: publicProcedure
+    .input(z.object({
+      sectionType: z.string(),
+      schema: z.any()
+    }))
+    .mutation(async ({ input }) => {
+      return await db.createSectionSchema({
+        sectionType: input.sectionType,
+        schema: input.schema
+      });
+    }),
+
+  updateSectionSchema: publicProcedure
+    .input(z.object({
+      sectionType: z.string(),
+      schema: z.any()
+    }))
+    .mutation(async ({ input }) => {
+      return await db.updateSectionSchema(input.sectionType, input.schema);
+    }),
 });
