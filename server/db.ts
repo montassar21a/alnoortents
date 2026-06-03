@@ -97,7 +97,26 @@ export async function getAdminSettings() {
   const db = await getDb();
   if (!db) return null;
   const result = await db.select().from(adminSettings).limit(1);
-  return result.length > 0 ? result[0] : null;
+  if (result.length > 0) return result[0];
+  // Auto-initialize default settings when table is empty
+  const defaults = {
+    adminUsername: "admin",
+    adminPassword: "admin123",
+    websiteTitle: "Al Noor Tents",
+    phone: "+97433555918",
+    email: "info@alnoortents.com",
+    address: "Dubai, United Arab Emirates",
+    whatsapp: "https://wa.me/97433555918",
+    enableCookieBanner: true,
+    cookieBannerTextEn: "We use cookies to improve your experience on our website. By browsing this website, you agree to our use of cookies.",
+    cookieBannerTextAr: "نحن نستخدم ملفات تعريف الارتباط لتحسين تجربتك على موقعنا. من خلال تصفح هذا الموقع، فإنك توافق على استخدامنا لملفات تعريف الارتباط.",
+    enableEmailNotifications: true,
+    mapZoom: 13,
+    smtpPort: 465,
+  };
+  await db.insert(adminSettings).values(defaults as any);
+  const inserted = await db.select().from(adminSettings).limit(1);
+  return inserted.length > 0 ? inserted[0] : null;
 }
 
 export async function updateAdminSettings(data: Partial<typeof adminSettings.$inferInsert>) {
