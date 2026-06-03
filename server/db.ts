@@ -1,6 +1,6 @@
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, adminSettings, testimonials, inquiries, notifications, statistics, menuItems, heroSection, pageContent, products, features, projects, sectors } from "../drizzle/schema";
+import { InsertUser, users, adminSettings, testimonials, inquiries, notifications, statistics, menuItems, heroSection, pageContent, products, features, projects, sectors, pageSections } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -463,4 +463,42 @@ export async function deleteSector(id: number) {
   const db = await getDb();
   if (!db) return null;
   return await db.delete(sectors).where(eq(sectors.id, id));
+}
+
+// ============================================================
+// PAGE SECTIONS
+// ============================================================
+export async function getPageSections(pageName: string = "home", activeOnly: boolean = false) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  if (activeOnly) {
+    return await db.select()
+      .from(pageSections)
+      .where(and(eq(pageSections.pageName, pageName), eq(pageSections.isActive, true)))
+      .orderBy(pageSections.orderIndex);
+  }
+  
+  return await db.select()
+    .from(pageSections)
+    .where(eq(pageSections.pageName, pageName))
+    .orderBy(pageSections.orderIndex);
+}
+
+export async function createPageSection(data: typeof pageSections.$inferInsert) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.insert(pageSections).values(data);
+}
+
+export async function updatePageSection(id: number, data: Partial<typeof pageSections.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.update(pageSections).set(data).where(eq(pageSections.id, id));
+}
+
+export async function deletePageSection(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.delete(pageSections).where(eq(pageSections.id, id));
 }

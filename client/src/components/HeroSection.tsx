@@ -1,29 +1,22 @@
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ChevronDown } from "lucide-react";
-import { trpc } from "@/lib/trpc";
 
-export default function HeroSection() {
-  const { t, lang } = useLanguage();
-  const { data: cms } = trpc.admin.content.get.useQuery({ sectionKey: "hero" });
-  const { data: hero } = trpc.admin.hero.get.useQuery();
-  const { data: settings } = trpc.admin.settings.get.useQuery();
+export default function HeroSection({ data }: { data?: any }) {
+  const { lang } = useLanguage();
 
-  const bgImage = hero?.imageUrl || "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/jtD7vMJSJN7HQvsfcDy4th/hero-main-5xCAP7fo2MqgtdUHktAwG6.webp";
-  const phone = settings?.phone || "+97433555918";
-  const whatsappUrl = settings?.whatsapp || "https://wa.me/97433555918";
-
-  const rawTitle = cms?.title || t("hero.title");
-  const titleLines = rawTitle.split("\n");
-  const subtitle = cms?.description || t("hero.subtitle");
-  const label = lang === "ar" ? (hero?.labelAr || t("hero.label")) : (hero?.labelEn || t("hero.label"));
-  const cta1 = lang === "ar" ? (hero?.cta1TextAr || t("hero.cta1")) : (hero?.cta1TextEn || t("hero.cta1"));
-  const cta2 = lang === "ar" ? (hero?.cta2TextAr || t("hero.cta2")) : (hero?.cta2TextEn || t("hero.cta2"));
-  const cta1Link = hero?.cta1Link || `tel:${phone}`;
-  const cta2Link = hero?.cta2Link || whatsappUrl;
+  const bgImage = data?.backgroundImage || "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/jtD7vMJSJN7HQvsfcDy4th/hero-main-5xCAP7fo2MqgtdUHktAwG6.webp";
+  
+  const label = data?.line1 || "";
+  const titleLines = [data?.line2 || "", data?.line3 || ""].filter(Boolean);
+  const subtitle = data?.description || "";
+  const buttonText = data?.buttonText || "";
+  const buttonLink = data?.buttonLink || "#";
 
   const scrollToTents = () => {
     document.querySelector("#what-we-build")?.scrollIntoView({ behavior: "smooth" });
   };
+
+  if (!data) return null;
 
   return (
     <section
@@ -43,22 +36,24 @@ export default function HeroSection() {
       />
 
       <div className="relative z-10 container flex flex-col items-center text-center px-4">
-        <div
-          className="flex items-center gap-3 mb-6"
-          style={{ animation: "fadeInDown 800ms cubic-bezier(0.23,1,0.32,1) 200ms both" }}
-        >
-          <span style={{ width: "2rem", height: "1px", background: "oklch(0.72 0.12 75)", display: "block" }} />
-          <span
-            style={{
-              fontFamily: "'DM Sans', sans-serif", fontSize: "0.65rem",
-              letterSpacing: "0.25em", textTransform: "uppercase",
-              color: "oklch(0.72 0.12 75)", fontWeight: 500,
-            }}
+        {label && (
+          <div
+            className="flex items-center gap-3 mb-6"
+            style={{ animation: "fadeInDown 800ms cubic-bezier(0.23,1,0.32,1) 200ms both" }}
           >
-            {label}
-          </span>
-          <span style={{ width: "2rem", height: "1px", background: "oklch(0.72 0.12 75)", display: "block" }} />
-        </div>
+            <span style={{ width: "2rem", height: "1px", background: "oklch(0.72 0.12 75)", display: "block" }} />
+            <span
+              style={{
+                fontFamily: "'DM Sans', sans-serif", fontSize: "0.65rem",
+                letterSpacing: "0.25em", textTransform: "uppercase",
+                color: "oklch(0.72 0.12 75)", fontWeight: 500,
+              }}
+            >
+              {label}
+            </span>
+            <span style={{ width: "2rem", height: "1px", background: "oklch(0.72 0.12 75)", display: "block" }} />
+          </div>
+        )}
 
         <h1
           className="text-white mb-6"
@@ -75,25 +70,28 @@ export default function HeroSection() {
           ))}
         </h1>
 
-        <p
-          className="text-white/70 mb-10 max-w-xl"
-          style={{
-            fontFamily: lang === "ar" ? "'Noto Naskh Arabic', sans-serif" : "'DM Sans', sans-serif",
-            fontSize: "clamp(0.9rem, 2vw, 1.05rem)", fontWeight: 300,
-            lineHeight: 1.7, letterSpacing: lang === "ar" ? "0" : "0.02em",
-            animation: "fadeInUp 900ms cubic-bezier(0.23,1,0.32,1) 500ms both",
-          }}
-        >
-          {subtitle}
-        </p>
+        {subtitle && (
+          <p
+            className="text-white/70 mb-10 max-w-xl"
+            style={{
+              fontFamily: lang === "ar" ? "'Noto Naskh Arabic', sans-serif" : "'DM Sans', sans-serif",
+              fontSize: "clamp(0.9rem, 2vw, 1.05rem)", fontWeight: 300,
+              lineHeight: 1.7, letterSpacing: lang === "ar" ? "0" : "0.02em",
+              animation: "fadeInUp 900ms cubic-bezier(0.23,1,0.32,1) 500ms both",
+            }}
+          >
+            {subtitle}
+          </p>
+        )}
 
-        <div
-          className="flex flex-wrap gap-4 justify-center"
-          style={{ animation: "fadeInUp 900ms cubic-bezier(0.23,1,0.32,1) 650ms both" }}
-        >
-          <a href={cta1Link} className="btn-gold">{cta1}</a>
-          <a href={cta2Link} target="_blank" rel="noopener noreferrer" className="btn-outline-gold">{cta2}</a>
-        </div>
+        {buttonText && (
+          <div
+            className="flex flex-wrap gap-4 justify-center"
+            style={{ animation: "fadeInUp 900ms cubic-bezier(0.23,1,0.32,1) 650ms both" }}
+          >
+            <a href={buttonLink} className="btn-gold">{buttonText}</a>
+          </div>
+        )}
       </div>
 
       <button

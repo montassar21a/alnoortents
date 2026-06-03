@@ -27,12 +27,15 @@ function FaviconUpdater() {
   return null;
 }
 
+import PageBuilder from "./pages/admin/PageBuilder";
+
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/super"} component={AdminPanel} />
+      <Route path={"/admin/page-builder"} component={PageBuilder} />
       <Route path={"/404"} component={NotFound} />
       <Route component={NotFound} />
     </Switch>

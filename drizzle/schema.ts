@@ -310,3 +310,22 @@ export const sectors = mysqlTable("sectors", {
 
 export type Sector = typeof sectors.$inferSelect;
 export type InsertSector = typeof sectors.$inferInsert;
+
+// ============================================================
+// DYNAMIC PAGE SECTIONS (CMS)
+// ============================================================
+
+export const pageSections = mysqlTable("pageSections", {
+  id: int("id").autoincrement().primaryKey(),
+  pageName: varchar("pageName", { length: 255 }).notNull().default("home"),
+  sectionType: varchar("sectionType", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  orderIndex: int("orderIndex").default(0),
+  isActive: boolean("isActive").default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PageSection = typeof pageSections.$inferSelect;
+export type InsertPageSection = typeof pageSections.$inferInsert;
+
