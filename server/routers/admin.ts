@@ -60,6 +60,7 @@ const settingsRouter = router({
         websiteTitle: z.string().nullish(),
         logoUrl: z.string().nullish(),
         logoKey: z.string().nullish(),
+        favicon: z.string().nullish(),
         phone: z.string().nullish(),
         email: z.string().nullish(),
         address: z.string().nullish(),
@@ -405,6 +406,110 @@ const contentRouter = router({
 });
 
 // ============================================================
+// PRODUCTS MANAGEMENT
+// ============================================================
+
+const productsRouter = router({
+  list: publicProcedure.query(async () => await db.getAllProducts()),
+  create: publicProcedure
+    .input(z.object({
+      titleEn: z.string(), titleAr: z.string().optional(),
+      descEn: z.string().optional(), descAr: z.string().optional(),
+      imageUrl: z.string().optional(), order: z.number().default(0), isVisible: z.boolean().default(true),
+    }))
+    .mutation(async ({ input }) => await db.createProduct(input)),
+  update: publicProcedure
+    .input(z.object({
+      id: z.number(), titleEn: z.string().optional(), titleAr: z.string().optional(),
+      descEn: z.string().optional(), descAr: z.string().optional(),
+      imageUrl: z.string().optional(), order: z.number().optional(), isVisible: z.boolean().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      return await db.updateProduct(id, data);
+    }),
+  delete: publicProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => await db.deleteProduct(input.id)),
+});
+
+// ============================================================
+// FEATURES MANAGEMENT
+// ============================================================
+
+const featuresRouter = router({
+  list: publicProcedure.query(async () => await db.getAllFeatures()),
+  create: publicProcedure
+    .input(z.object({
+      titleEn: z.string(), titleAr: z.string().optional(),
+      descEn: z.string().optional(), descAr: z.string().optional(),
+      icon: z.string().optional(), order: z.number().default(0), isVisible: z.boolean().default(true),
+    }))
+    .mutation(async ({ input }) => await db.createFeature(input)),
+  update: publicProcedure
+    .input(z.object({
+      id: z.number(), titleEn: z.string().optional(), titleAr: z.string().optional(),
+      descEn: z.string().optional(), descAr: z.string().optional(),
+      icon: z.string().optional(), order: z.number().optional(), isVisible: z.boolean().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      return await db.updateFeature(id, data);
+    }),
+  delete: publicProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => await db.deleteFeature(input.id)),
+});
+
+// ============================================================
+// PROJECTS MANAGEMENT
+// ============================================================
+
+const projectsRouter = router({
+  list: publicProcedure.query(async () => await db.getAllProjects()),
+  create: publicProcedure
+    .input(z.object({
+      titleEn: z.string(), titleAr: z.string().optional(),
+      categoryEn: z.string(), categoryAr: z.string().optional(),
+      imageUrl: z.string(), order: z.number().default(0), isVisible: z.boolean().default(true),
+    }))
+    .mutation(async ({ input }) => await db.createProject(input)),
+  update: publicProcedure
+    .input(z.object({
+      id: z.number(), titleEn: z.string().optional(), titleAr: z.string().optional(),
+      categoryEn: z.string().optional(), categoryAr: z.string().optional(),
+      imageUrl: z.string().optional(), order: z.number().optional(), isVisible: z.boolean().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      return await db.updateProject(id, data);
+    }),
+  delete: publicProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => await db.deleteProject(input.id)),
+});
+
+// ============================================================
+// SECTORS MANAGEMENT
+// ============================================================
+
+const sectorsRouter = router({
+  list: publicProcedure.query(async () => await db.getAllSectors()),
+  create: publicProcedure
+    .input(z.object({
+      titleEn: z.string(), titleAr: z.string().optional(),
+      descEn: z.string().optional(), descAr: z.string().optional(),
+      icon: z.string().optional(), order: z.number().default(0), isVisible: z.boolean().default(true),
+    }))
+    .mutation(async ({ input }) => await db.createSector(input)),
+  update: publicProcedure
+    .input(z.object({
+      id: z.number(), titleEn: z.string().optional(), titleAr: z.string().optional(),
+      descEn: z.string().optional(), descAr: z.string().optional(),
+      icon: z.string().optional(), order: z.number().optional(), isVisible: z.boolean().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      return await db.updateSector(id, data);
+    }),
+  delete: publicProcedure.input(z.object({ id: z.number() })).mutation(async ({ input }) => await db.deleteSector(input.id)),
+});
+
+// ============================================================
 // MAIN ADMIN ROUTER
 // ============================================================
 
@@ -418,4 +523,8 @@ export const adminRouter = router({
   menu: menuRouter,
   hero: heroRouter,
   content: contentRouter,
+  products: productsRouter,
+  features: featuresRouter,
+  projects: projectsRouter,
+  sectors: sectorsRouter,
 });

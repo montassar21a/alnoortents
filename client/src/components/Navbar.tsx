@@ -3,6 +3,7 @@
    Dark luxury: transparent → solid on scroll, gold accents,
    hamburger mobile menu, EN/AR language switcher
    ============================================================ */
+import { trpc } from "@/lib/trpc";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocation } from "wouter";
@@ -17,6 +18,8 @@ export default function Navbar() {
   const [, navigate] = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  
+  const { data: settings } = trpc.admin.settings.get.useQuery();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -81,25 +84,31 @@ export default function Navbar() {
               onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
               className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center"
             >
-              <span
-                className="font-display text-white tracking-widest uppercase"
-                style={{ fontSize: "1.1rem", letterSpacing: "0.25em", fontWeight: 700 }}
-              >
-                {lang === "ar" ? "خيام النور" : "AL NOOR"}
-              </span>
-              <span
-                className="tracking-widest uppercase"
-                style={{
-                  fontSize: "0.55rem",
-                  letterSpacing: "0.35em",
-                  color: "oklch(0.72 0.12 75)",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: 500,
-                  marginTop: "1px",
-                }}
-              >
-                {lang === "ar" ? "TENTS" : "TENTS"}
-              </span>
+              {settings?.logoUrl ? (
+                <img src={settings.logoUrl} alt="Logo" className="h-10 md:h-12 object-contain" />
+              ) : (
+                <>
+                  <span
+                    className="font-display text-white tracking-widest uppercase"
+                    style={{ fontSize: "1.1rem", letterSpacing: "0.25em", fontWeight: 700 }}
+                  >
+                    {lang === "ar" ? "خيام النور" : "AL NOOR"}
+                  </span>
+                  <span
+                    className="tracking-widest uppercase"
+                    style={{
+                      fontSize: "0.55rem",
+                      letterSpacing: "0.35em",
+                      color: "oklch(0.72 0.12 75)",
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontWeight: 500,
+                      marginTop: "1px",
+                    }}
+                  >
+                    {lang === "ar" ? "TENTS" : "TENTS"}
+                  </span>
+                </>
+              )}
             </a>
 
             {/* Right: Social + Lang switcher */}

@@ -1,6 +1,6 @@
 import { eq, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, adminSettings, testimonials, inquiries, notifications, statistics, menuItems, heroSection, pageContent } from "../drizzle/schema";
+import { InsertUser, users, adminSettings, testimonials, inquiries, notifications, statistics, menuItems, heroSection, pageContent, products, features, projects, sectors } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -312,4 +312,136 @@ export async function updatePageContent(sectionKey: string, data: Partial<typeof
   } else {
     return await db.insert(pageContent).values({ sectionKey, ...data } as any);
   }
+}
+
+// ============================================================
+// PRODUCTS
+// ============================================================
+export async function getProducts() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(products).where(eq(products.isVisible, true)).orderBy(products.order);
+}
+
+export async function getAllProducts() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(products).orderBy(products.order);
+}
+
+export async function createProduct(data: typeof products.$inferInsert) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.insert(products).values(data);
+}
+
+export async function updateProduct(id: number, data: Partial<typeof products.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.update(products).set(data).where(eq(products.id, id));
+}
+
+export async function deleteProduct(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.delete(products).where(eq(products.id, id));
+}
+
+// ============================================================
+// FEATURES
+// ============================================================
+export async function getFeatures() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(features).where(eq(features.isVisible, true)).orderBy(features.order);
+}
+
+export async function getAllFeatures() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(features).orderBy(features.order);
+}
+
+export async function createFeature(data: typeof features.$inferInsert) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.insert(features).values(data);
+}
+
+export async function updateFeature(id: number, data: Partial<typeof features.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.update(features).set(data).where(eq(features.id, id));
+}
+
+export async function deleteFeature(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.delete(features).where(eq(features.id, id));
+}
+
+// ============================================================
+// PROJECTS
+// ============================================================
+export async function getProjects() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(projects).where(eq(projects.isVisible, true)).orderBy(projects.order);
+}
+
+export async function getAllProjects() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(projects).orderBy(projects.order);
+}
+
+export async function createProject(data: typeof projects.$inferInsert) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.insert(projects).values(data);
+}
+
+export async function updateProject(id: number, data: Partial<typeof projects.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.update(projects).set(data).where(eq(projects.id, id));
+}
+
+export async function deleteProject(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.delete(projects).where(eq(projects.id, id));
+}
+
+// ============================================================
+// SECTORS
+// ============================================================
+export async function getSectors() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(sectors).where(eq(sectors.isVisible, true)).orderBy(sectors.order);
+}
+
+export async function getAllSectors() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(sectors).orderBy(sectors.order);
+}
+
+export async function createSector(data: typeof sectors.$inferInsert) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.insert(sectors).values(data);
+}
+
+export async function updateSector(id: number, data: Partial<typeof sectors.$inferInsert>) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.update(sectors).set(data).where(eq(sectors.id, id));
+}
+
+export async function deleteSector(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  return await db.delete(sectors).where(eq(sectors.id, id));
 }

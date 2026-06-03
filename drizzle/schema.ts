@@ -219,12 +219,9 @@ export type InsertStatistics = typeof statistics.$inferInsert;
 
 export const pageContent = mysqlTable("pageContent", {
   id: int("id").autoincrement().primaryKey(),
-  // Section identifier
   sectionKey: varchar("sectionKey", { length: 255 }).notNull().unique(),
-  // Bilingual content
   contentEn: text("contentEn"),
   contentAr: text("contentAr"),
-  // Metadata
   title: varchar("title", { length: 255 }),
   description: text("description"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -233,3 +230,83 @@ export const pageContent = mysqlTable("pageContent", {
 
 export type PageContent = typeof pageContent.$inferSelect;
 export type InsertPageContent = typeof pageContent.$inferInsert;
+
+// ============================================================
+// PRODUCTS (What We Build)
+// ============================================================
+
+export const products = mysqlTable("products", {
+  id: int("id").autoincrement().primaryKey(),
+  titleEn: varchar("titleEn", { length: 255 }).notNull(),
+  titleAr: varchar("titleAr", { length: 255 }),
+  descEn: text("descEn"),
+  descAr: text("descAr"),
+  imageUrl: text("imageUrl"),
+  order: int("order").default(0),
+  isVisible: boolean("isVisible").default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Product = typeof products.$inferSelect;
+export type InsertProduct = typeof products.$inferInsert;
+
+// ============================================================
+// FEATURES (Why Choose Us)
+// ============================================================
+
+export const features = mysqlTable("features", {
+  id: int("id").autoincrement().primaryKey(),
+  titleEn: varchar("titleEn", { length: 255 }).notNull(),
+  titleAr: varchar("titleAr", { length: 255 }),
+  descEn: text("descEn"),
+  descAr: text("descAr"),
+  icon: varchar("icon", { length: 255 }), // Icon name or SVG
+  order: int("order").default(0),
+  isVisible: boolean("isVisible").default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Feature = typeof features.$inferSelect;
+export type InsertFeature = typeof features.$inferInsert;
+
+// ============================================================
+// PROJECTS (Our Work Gallery)
+// ============================================================
+
+export const projects = mysqlTable("projects", {
+  id: int("id").autoincrement().primaryKey(),
+  titleEn: varchar("titleEn", { length: 255 }).notNull(),
+  titleAr: varchar("titleAr", { length: 255 }),
+  categoryEn: varchar("categoryEn", { length: 255 }).notNull(), // e.g. "government", "weddings"
+  categoryAr: varchar("categoryAr", { length: 255 }),
+  imageUrl: text("imageUrl").notNull(),
+  order: int("order").default(0),
+  isVisible: boolean("isVisible").default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Project = typeof projects.$inferSelect;
+export type InsertProject = typeof projects.$inferInsert;
+
+// ============================================================
+// SECTORS (Who We Work With / Clients)
+// ============================================================
+
+export const sectors = mysqlTable("sectors", {
+  id: int("id").autoincrement().primaryKey(),
+  titleEn: varchar("titleEn", { length: 255 }).notNull(),
+  titleAr: varchar("titleAr", { length: 255 }),
+  descEn: text("descEn"),
+  descAr: text("descAr"),
+  icon: varchar("icon", { length: 255 }),
+  order: int("order").default(0),
+  isVisible: boolean("isVisible").default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Sector = typeof sectors.$inferSelect;
+export type InsertSector = typeof sectors.$inferInsert;

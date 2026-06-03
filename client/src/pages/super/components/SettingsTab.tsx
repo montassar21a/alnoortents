@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Save } from "lucide-react";
+import { ImageUpload } from "@/components/ImageUpload";
 
 export default function SettingsTab() {
   const { data: settings, refetch } = trpc.admin.settings.get.useQuery();
@@ -75,7 +76,7 @@ export default function SettingsTab() {
       <Card className="bg-slate-900 border-slate-800">
         <CardHeader>
           <CardTitle>Website Configuration</CardTitle>
-          <CardDescription>Manage your company details and social links</CardDescription>
+          <CardDescription>Manage your company details, logo, and social links</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -96,6 +97,23 @@ export default function SettingsTab() {
                 className="bg-slate-950 border-slate-800"
               />
             </div>
+            
+            {/* Logo and Favicon */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300">Website Logo</label>
+              <ImageUpload
+                value={formData.logoUrl || ""}
+                onChange={(url) => setFormData({ ...formData, logoUrl: url })}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300">Favicon</label>
+              <ImageUpload
+                value={formData.favicon || ""}
+                onChange={(url) => setFormData({ ...formData, favicon: url })}
+              />
+            </div>
+
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-300">Phone Number</label>
               <Input
