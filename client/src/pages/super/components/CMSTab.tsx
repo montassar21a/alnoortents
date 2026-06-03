@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Save, Image as ImageIcon } from "lucide-react";
+import { Save } from "lucide-react";
 import { ImageUpload } from "@/components/ImageUpload";
 
 import { ProductsEditor } from "./ProductsEditor";
@@ -27,61 +27,9 @@ const SECTIONS = [
 
 export default function CMSTab() {
   const [activeSection, setActiveSection] = useState(SECTIONS[0].id);
-  const { data: settings, refetch: refetchSettings } = trpc.admin.settings.get.useQuery();
-  const updateSettings = trpc.admin.settings.update.useMutation();
-
-  const handleLogoChange = (url: string) => {
-    updateSettings.mutate({ logoUrl: url }, {
-      onSuccess: () => { toast.success("Logo updated!"); refetchSettings(); }
-    });
-  };
-
-  const handleFaviconChange = (url: string) => {
-    updateSettings.mutate({ favicon: url }, {
-      onSuccess: () => { toast.success("Favicon updated!"); refetchSettings(); }
-    });
-  };
 
   return (
-    <div className="space-y-8">
-      {/* Brand Identity - Logo & Favicon */}
-      <Card className="bg-slate-900 border-slate-800">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <ImageIcon className="w-5 h-5 text-amber-500" /> Brand Identity
-          </CardTitle>
-          <CardDescription>Upload your logo and favicon — these appear on the live website navbar and browser tab</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Website Logo</label>
-              <p className="text-xs text-slate-500 mb-2">Shown in the navbar. Recommended: transparent PNG, max 200px height.</p>
-              <ImageUpload value={settings?.logoUrl || ""} onChange={handleLogoChange} />
-              {settings?.logoUrl && (
-                <div className="mt-2 p-3 bg-slate-950 rounded-lg border border-slate-800 flex items-center gap-3">
-                  <img src={settings.logoUrl} alt="Current logo" className="h-10 object-contain" />
-                  <span className="text-xs text-slate-500">Current logo preview</span>
-                </div>
-              )}
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Favicon</label>
-              <p className="text-xs text-slate-500 mb-2">Browser tab icon. Recommended: 32x32px ICO or PNG.</p>
-              <ImageUpload value={settings?.favicon || ""} onChange={handleFaviconChange} />
-              {settings?.favicon && (
-                <div className="mt-2 p-3 bg-slate-950 rounded-lg border border-slate-800 flex items-center gap-3">
-                  <img src={settings.favicon} alt="Current favicon" className="w-8 h-8 object-contain" />
-                  <span className="text-xs text-slate-500">Current favicon preview</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Section Selector & Editor */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-1 space-y-2">
           {SECTIONS.map((sec) => (
             <button
@@ -110,7 +58,6 @@ export default function CMSTab() {
           {activeSection === "clients" && <SectorsEditor />}
         </div>
       </div>
-    </div>
   );
 }
 
