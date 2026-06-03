@@ -6,68 +6,66 @@ import { useState, useEffect, useCallback } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const testimonials = [
+import { trpc } from "@/lib/trpc";
+
+const defaultTestimonials = [
   {
-    name: "Ahmed Al Mansoori",
-    role: "Event Director, Dubai",
-    text: "Al Noor Tents transformed our corporate gala into an unforgettable experience. The arch structure was breathtaking, and the setup team was incredibly professional. We've used them three times now and will continue to do so.",
+    authorName: "Ahmed Al Mansoori",
+    authorRole: "Event Director, Dubai",
+    textEn: "Al Noor Tents transformed our corporate gala into an unforgettable experience. The arch structure was breathtaking, and the setup team was incredibly professional. We've used them three times now and will continue to do so.",
     textAr: "حوّلت خيام النور حفل شركتنا إلى تجربة لا تُنسى. كان هيكل القوس رائعاً، وكان فريق التركيب محترفاً للغاية. استخدمناهم ثلاث مرات وسنستمر في ذلك.",
   },
   {
-    name: "Sarah Thompson",
-    role: "Wedding Planner, Abu Dhabi",
-    text: "The wedding tent from Al Noor was absolutely stunning. Our clients were amazed by the quality and elegance. The team delivered on time and exceeded all expectations. Highly recommended for luxury events.",
+    authorName: "Sarah Thompson",
+    authorRole: "Wedding Planner, Abu Dhabi",
+    textEn: "The wedding tent from Al Noor was absolutely stunning. Our clients were amazed by the quality and elegance. The team delivered on time and exceeded all expectations. Highly recommended for luxury events.",
     textAr: "كانت خيمة الزفاف من خيام النور رائعة للغاية. أُعجب عملاؤنا بالجودة والأناقة. سلّم الفريق في الوقت المحدد وتجاوز جميع التوقعات. موصى به بشدة للفعاليات الفاخرة.",
   },
   {
-    name: "Mohammed Al Rashidi",
-    role: "Hotel Manager, Jumeirah",
-    text: "We partnered with Al Noor Tents for our poolside expansion and the result was exceptional. The dome structure blended perfectly with our resort's aesthetic. Our guests love it and it has become a signature feature.",
+    authorName: "Mohammed Al Rashidi",
+    authorRole: "Hotel Manager, Jumeirah",
+    textEn: "We partnered with Al Noor Tents for our poolside expansion and the result was exceptional. The dome structure blended perfectly with our resort's aesthetic. Our guests love it and it has become a signature feature.",
     textAr: "تعاونّا مع خيام النور لتوسعة منطقة حمام السباحة لدينا وكانت النتيجة استثنائية. تمازج هيكل القبة بشكل مثالي مع جماليات منتجعنا. يحبه ضيوفنا وأصبح ميزة مميزة.",
   },
   {
-    name: "Fatima Al Zaabi",
-    role: "Government Events Coordinator",
-    text: "For our national day celebrations, we needed a structure that conveyed prestige and scale. Al Noor delivered exactly that — a magnificent arch tent that became the centerpiece of the entire event.",
+    authorName: "Fatima Al Zaabi",
+    authorRole: "Government Events Coordinator",
+    textEn: "For our national day celebrations, we needed a structure that conveyed prestige and scale. Al Noor delivered exactly that — a magnificent arch tent that became the centerpiece of the entire event.",
     textAr: "لاحتفالات يومنا الوطني، كنا بحاجة إلى هيكل يعكس المكانة والحجم. قدّمت خيام النور بالضبط ذلك — خيمة قوس رائعة أصبحت محور الحدث بأكمله.",
   },
   {
-    name: "Lucas Fernandez",
-    role: "Festival Organizer, Riyadh",
-    text: "The industrial-grade quality combined with the luxury finish is what sets Al Noor apart. We've used their tents for outdoor festivals in extreme heat and they performed flawlessly every single time.",
-  }
+    authorName: "Lucas Fernandez",
+    authorRole: "Festival Organizer, Riyadh",
+    textEn: "The industrial-grade quality combined with the luxury finish is what sets Al Noor apart. We've used their tents for outdoor festivals in extreme heat and they performed flawlessly every single time.",
+  },
 ];
-
-import { trpc } from "@/lib/trpc";
 
 export default function TestimonialsSection() {
   const { t, lang } = useLanguage();
   const { data: cms } = trpc.admin.content.get.useQuery({ sectionKey: "testimonials" });
   
-  // Real testimonials from the database
   const { data: dbTestimonials = [] } = trpc.admin.testimonials.list.useQuery();
 
-  // Combine static and dynamic
   const testimonials = dbTestimonials.length > 0 
     ? dbTestimonials.filter(t => t.isVisible)
     : [
         {
-          text: "Al Noor Tents delivered an incredible structure for our royal wedding. The arch design was flawless and the team was highly professional.",
+          textEn: "Al Noor Tents delivered an incredible structure for our royal wedding. The arch design was flawless and the team was highly professional.",
           textAr: "قدمت خيام النور هيكلًا مذهلًا لحفل زفافنا الملكي. كان تصميم القوس لا تشوبه شائبة وكان الفريق محترفًا للغاية.",
-          name: "Ahmed Al Maktoum",
-          role: "Event Organizer, Dubai",
+          authorName: "Ahmed Al Maktoum",
+          authorRole: "Event Organizer, Dubai",
         },
         {
-          text: "Their geodesic domes completely transformed our glamping resort. Durable, beautiful, and installed in record time.",
+          textEn: "Their geodesic domes completely transformed our glamping resort. Durable, beautiful, and installed in record time.",
           textAr: "لقد غيرت قبابهم الجيوديسية منتجع التخييم الخاص بنا تمامًا. متينة وجميلة وتم تركيبها في وقت قياسي.",
-          name: "Sarah Jones",
-          role: "Resort Manager, Oman",
+          authorName: "Sarah Jones",
+          authorRole: "Resort Manager, Oman",
         },
         {
-          text: "The Ramadan majlis they built for our hotel was the talk of the season. Authentic feel with modern engineering.",
+          textEn: "The Ramadan majlis they built for our hotel was the talk of the season. Authentic feel with modern engineering.",
           textAr: "كان مجلس رمضان الذي بنوه لفندقنا حديث الموسم. شعور أصيل مع هندسة حديثة.",
-          name: "Mohammed Al Qahtani",
-          role: "Director of Operations, Riyadh",
+          authorName: "Mohammed Al Qahtani",
+          authorRole: "Director of Operations, Riyadh",
         },
       ];
 
@@ -146,7 +144,7 @@ export default function TestimonialsSection() {
                 fontStyle: lang === "en" ? "italic" : "normal",
               }}
             >
-              {lang === "ar" ? testimonial.textAr : testimonial.text}
+              {lang === "ar" ? testimonial.textAr : testimonial.textEn}
             </p>
 
             {/* Gold divider */}
@@ -164,7 +162,7 @@ export default function TestimonialsSection() {
                 letterSpacing: "0.05em",
               }}
             >
-              {testimonial.name}
+              {testimonial.authorName}
             </p>
             <p
               className="text-white/40"
@@ -174,7 +172,7 @@ export default function TestimonialsSection() {
                 letterSpacing: "0.08em",
               }}
             >
-              {testimonial.role}
+              {testimonial.authorRole}
             </p>
           </div>
 
