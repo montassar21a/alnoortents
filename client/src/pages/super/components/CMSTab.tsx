@@ -155,41 +155,25 @@ function CMSForm({ sectionKey, title }: { sectionKey: string, title: string }) {
 }
 
 function HeroSectionEditor() {
-  const { data: hero, refetch, isLoading } = trpc.admin.hero.get.useQuery();
-  const updateHero = trpc.admin.hero.update.useMutation();
+  const { data: content, refetch, isLoading } = trpc.admin.content.get.useQuery({ sectionKey: "hero" });
+  const updateContent = trpc.admin.content.update.useMutation();
 
-  const [formData, setFormData] = useState({
-    titleEn: "", titleAr: "", subtitleEn: "", subtitleAr: "",
-    labelEn: "", labelAr: "",
-    cta1TextEn: "", cta1TextAr: "", cta1Link: "",
-    cta2TextEn: "", cta2TextAr: "", cta2Link: "",
-    imageUrl: "", iconColor: "",
-  });
+  const [formData, setFormData] = useState({ title: "", description: "", contentEn: "", contentAr: "" });
 
   useEffect(() => {
-    if (hero) {
+    if (content) {
       setFormData({
-        titleEn: hero.titleEn || "",
-        titleAr: hero.titleAr || "",
-        subtitleEn: hero.subtitleEn || "",
-        subtitleAr: hero.subtitleAr || "",
-        labelEn: hero.labelEn || "",
-        labelAr: hero.labelAr || "",
-        cta1TextEn: hero.cta1TextEn || "",
-        cta1TextAr: hero.cta1TextAr || "",
-        cta1Link: hero.cta1Link || "",
-        cta2TextEn: hero.cta2TextEn || "",
-        cta2TextAr: hero.cta2TextAr || "",
-        cta2Link: hero.cta2Link || "",
-        imageUrl: hero.imageUrl || "",
-        iconColor: hero.iconColor || "",
+        title: content.title || "",
+        description: content.description || "",
+        contentEn: content.contentEn || "",
+        contentAr: content.contentAr || "",
       });
     }
-  }, [hero]);
+  }, [content]);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    updateHero.mutate(formData, {
+    updateContent.mutate({ sectionKey: "hero", ...formData }, {
       onSuccess: () => { toast.success("Hero section updated!"); refetch(); }
     });
   };
@@ -199,86 +183,54 @@ function HeroSectionEditor() {
   return (
     <Card className="bg-slate-900 border-slate-800">
       <CardHeader>
-        <CardTitle>Hero Section Settings</CardTitle>
-        <CardDescription>Background image, title, subtitle, and call-to-action buttons</CardDescription>
+        <CardTitle>Hero Section — Main Content</CardTitle>
+        <CardDescription>This is what appears on the live homepage hero. Edit the title and subtitle below.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSave} className="space-y-6">
+        <form onSubmit={handleSave} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-300">Hero Background Image</label>
-            <p className="text-xs text-slate-500 mb-2">Full-screen background behind the hero content. Recommended: 1920x1080px+</p>
-            <ImageUpload value={formData.imageUrl} onChange={(url) => setFormData({ ...formData, imageUrl: url })} />
-            {formData.imageUrl && (
-              <img src={formData.imageUrl} alt="Hero background" className="w-full h-32 object-cover rounded-lg mt-2 border border-slate-800" />
-            )}
+            <label className="text-sm font-medium text-slate-300">Main Heading <span className="text-xs text-slate-500">(English)</span></label>
+            <Textarea
+              value={formData.title}
+              onChange={e => setFormData({ ...formData, title: e.target.value })}
+              className="bg-slate-950 border-slate-800 h-24"
+              placeholder="ICONIC TENT&#10;STRUCTURES"
+            />
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Title <span className="text-xs text-slate-500">(English)</span></label>
-              <Textarea value={formData.titleEn} onChange={e => setFormData({ ...formData, titleEn: e.target.value })} className="bg-slate-950 border-slate-800 h-20" placeholder="Premium Tent Solutions&#10;For Every Occasion" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Title <span className="text-xs text-slate-500">(Arabic)</span></label>
-              <Textarea value={formData.titleAr} onChange={e => setFormData({ ...formData, titleAr: e.target.value })} className="bg-slate-950 border-slate-800 h-20" dir="rtl" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Subtitle <span className="text-xs text-slate-500">(English)</span></label>
-              <Textarea value={formData.subtitleEn} onChange={e => setFormData({ ...formData, subtitleEn: e.target.value })} className="bg-slate-950 border-slate-800 h-20" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Subtitle <span className="text-xs text-slate-500">(Arabic)</span></label>
-              <Textarea value={formData.subtitleAr} onChange={e => setFormData({ ...formData, subtitleAr: e.target.value })} className="bg-slate-950 border-slate-800 h-20" dir="rtl" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Label <span className="text-xs text-slate-500">(English)</span></label>
-              <Input value={formData.labelEn} onChange={e => setFormData({ ...formData, labelEn: e.target.value })} className="bg-slate-950 border-slate-800" placeholder="Premium Tent Solutions" />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Label <span className="text-xs text-slate-500">(Arabic)</span></label>
-              <Input value={formData.labelAr} onChange={e => setFormData({ ...formData, labelAr: e.target.value })} className="bg-slate-950 border-slate-800" dir="rtl" />
-            </div>
-          </div>
-
-          <div className="border-t border-slate-800 pt-6">
-            <h4 className="text-md font-bold text-white mb-4">Call-to-Action Buttons</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">CTA 1 Text <span className="text-xs text-slate-500">(EN)</span></label>
-                <Input value={formData.cta1TextEn} onChange={e => setFormData({ ...formData, cta1TextEn: e.target.value })} className="bg-slate-950 border-slate-800" placeholder="CALL NOW" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">CTA 1 Text <span className="text-xs text-slate-500">(AR)</span></label>
-                <Input value={formData.cta1TextAr} onChange={e => setFormData({ ...formData, cta1TextAr: e.target.value })} className="bg-slate-950 border-slate-800" dir="rtl" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">CTA 1 Link</label>
-                <Input value={formData.cta1Link} onChange={e => setFormData({ ...formData, cta1Link: e.target.value })} className="bg-slate-950 border-slate-800" placeholder="tel:+97433555918" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">CTA 2 Text <span className="text-xs text-slate-500">(EN)</span></label>
-                <Input value={formData.cta2TextEn} onChange={e => setFormData({ ...formData, cta2TextEn: e.target.value })} className="bg-slate-950 border-slate-800" placeholder="CONTACT US ON WHATSAPP" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">CTA 2 Text <span className="text-xs text-slate-500">(AR)</span></label>
-                <Input value={formData.cta2TextAr} onChange={e => setFormData({ ...formData, cta2TextAr: e.target.value })} className="bg-slate-950 border-slate-800" dir="rtl" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">CTA 2 Link</label>
-                <Input value={formData.cta2Link} onChange={e => setFormData({ ...formData, cta2Link: e.target.value })} className="bg-slate-950 border-slate-800" placeholder="https://wa.me/97433555918" />
-              </div>
-            </div>
-          </div>
-
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-300">Accent Icon Color (Hex)</label>
-            <div className="flex items-center gap-3">
-              <input type="color" value={formData.iconColor || "#c9a84c"} onChange={e => setFormData({ ...formData, iconColor: e.target.value })} className="w-10 h-10 rounded cursor-pointer bg-transparent border border-slate-800" />
-              <Input value={formData.iconColor} onChange={e => setFormData({ ...formData, iconColor: e.target.value })} className="bg-slate-950 border-slate-800 w-32 font-mono" placeholder="#c9a84c" />
+            <label className="text-sm font-medium text-slate-300">Subheading / Description <span className="text-xs text-slate-500">(English)</span></label>
+            <Textarea
+              value={formData.description}
+              onChange={e => setFormData({ ...formData, description: e.target.value })}
+              className="bg-slate-950 border-slate-800 h-24"
+              placeholder="Designing &amp; building luxury tensile structures across the Middle East"
+            />
+          </div>
+
+          <div className="pt-4 border-t border-slate-800 space-y-4">
+            <h4 className="text-sm font-semibold text-white">Bilingual Content</h4>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300">English Content</label>
+              <Textarea
+                value={formData.contentEn}
+                onChange={e => setFormData({ ...formData, contentEn: e.target.value })}
+                className="bg-slate-950 border-slate-800 h-32 font-mono text-sm"
+                placeholder="Additional English content (used by some sections)"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300">Arabic Content (محتوى عربي)</label>
+              <Textarea
+                value={formData.contentAr}
+                onChange={e => setFormData({ ...formData, contentAr: e.target.value })}
+                className="bg-slate-950 border-slate-800 h-32 font-mono text-sm"
+                dir="rtl"
+                placeholder="محتوى إضافي باللغة العربية"
+              />
             </div>
           </div>
 
-          <Button type="submit" className="bg-amber-600 hover:bg-amber-700 w-full" disabled={updateHero.isPending}>
+          <Button type="submit" className="bg-amber-600 hover:bg-amber-700 w-full" disabled={updateContent.isPending}>
             <Save className="w-4 h-4 mr-2" /> Save Hero Section
           </Button>
         </form>
