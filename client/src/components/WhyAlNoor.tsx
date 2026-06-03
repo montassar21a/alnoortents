@@ -1,26 +1,30 @@
-/* ============================================================
-   AL NOOR TENTS — Why Al Noor Section
-   Dark overlay over tent background, 6 feature points with star icons
-   ============================================================ */
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trpc } from "@/lib/trpc";
 import { ShieldCheck, Zap, Compass, MapPin, Clock, Award, Star as StarIcon } from "lucide-react";
 
-const BG_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/jtD7vMJSJN7HQvsfcDy4th/hero-main-5xCAP7fo2MqgtdUHktAwG6.webp";
-const WHATSAPP_URL = "https://wa.me/971500000000";
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  ShieldCheck, Zap, Compass, MapPin, Clock, Award, Star: StarIcon,
+};
+
+const defaultFeatures = [
+  { titleEn: "Premium Quality Materials", titleAr: "مواد عالية الجودة", descEn: "", descAr: "", icon: "ShieldCheck" },
+  { titleEn: "Fast Installation", titleAr: "تركيب سريع", descEn: "", descAr: "", icon: "Zap" },
+  { titleEn: "Expert Engineering", titleAr: "هندسة خبراء", descEn: "", descAr: "", icon: "Compass" },
+  { titleEn: "Middle East Coverage", titleAr: "تغطية الشرق الأوسط", descEn: "", descAr: "", icon: "MapPin" },
+  { titleEn: "On-Time Delivery", titleAr: "تسليم في الوقت المحدد", descEn: "", descAr: "", icon: "Clock" },
+  { titleEn: "Award-Winning Service", titleAr: "خدمة حائزة على جوائز", descEn: "", descAr: "", icon: "Award" },
+];
 
 export default function WhyAlNoor() {
   const { t, lang } = useLanguage();
   const { data: cms } = trpc.admin.content.get.useQuery({ sectionKey: "why-choose-us" });
+  const { data: dbFeatures = [] } = trpc.admin.features.list.useQuery();
 
-  const features = [
-    { key: "why.f1", icon: ShieldCheck, delay: 0 },
-    { key: "why.f2", icon: Zap, delay: 100 },
-    { key: "why.f3", icon: Compass, delay: 200 },
-    { key: "why.f4", icon: MapPin, delay: 300 },
-    { key: "why.f5", icon: Clock, delay: 400 },
-    { key: "why.f6", icon: Award, delay: 500 },
-  ];
+  const sectionLabel = lang === "ar" ? (cms?.contentAr || t("why.label")) : (cms?.contentEn || t("why.label"));
+
+  const features = dbFeatures.length > 0
+    ? dbFeatures.filter(f => f.isVisible !== false).sort((a, b) => (a.order || 0) - (b.order || 0))
+    : defaultFeatures;
 
   return (
     <section className="py-24 md:py-32 relative overflow-hidden" style={{ background: "oklch(0.08 0.012 60)" }}>
@@ -28,7 +32,7 @@ export default function WhyAlNoor() {
 
       <div className="container relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-20 reveal">
-          <div className="section-label mx-auto">{t("why.label")}</div>
+          <div className="section-label mx-auto">{sectionLabel}</div>
           <h2
             className="text-white mb-6"
             style={{
@@ -54,37 +58,38 @@ export default function WhyAlNoor() {
           </p>
         </div>
 
-        {/* Features grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:gap-12 mb-14">
-          {features.map(({ key, icon: Icon, delay }, i) => (
-            <div
-              key={key}
-              className="reveal flex flex-col items-center text-center gap-4"
-              style={{ transitionDelay: `${i * 80}ms` }}
-            >
-              <div style={{ color: "oklch(0.72 0.12 75)" }}>
-                <StarIcon />
-              </div>
-              <p
-                className="text-white/85"
-                style={{
-                  fontFamily: lang === "ar" ? "'Noto Naskh Arabic', sans-serif" : "'DM Sans', sans-serif",
-                  fontSize: "0.75rem",
-                  fontWeight: 500,
-                  letterSpacing: lang === "ar" ? "0" : "0.12em",
-                  textTransform: lang === "ar" ? "none" : "uppercase",
-                  lineHeight: 1.5,
-                }}
+          {features.map((f, i) => {
+            const IconComp = (f.icon && iconMap[f.icon]) || StarIcon;
+            return (
+              <div
+                key={`feature-${i}`}
+                className="reveal flex flex-col items-center text-center gap-4"
+                style={{ transitionDelay: `${i * 80}ms` }}
               >
-                {t(key)}
-              </p>
-            </div>
-          ))}
+                <div style={{ color: "oklch(0.72 0.12 75)" }}>
+                  <IconComp />
+                </div>
+                <p
+                  className="text-white/85"
+                  style={{
+                    fontFamily: lang === "ar" ? "'Noto Naskh Arabic', sans-serif" : "'DM Sans', sans-serif",
+                    fontSize: "0.75rem",
+                    fontWeight: 500,
+                    letterSpacing: lang === "ar" ? "0" : "0.12em",
+                    textTransform: lang === "ar" ? "none" : "uppercase",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {lang === "ar" ? (f.titleAr || f.titleEn) : f.titleEn}
+                </p>
+              </div>
+            );
+          })}
         </div>
 
-        {/* CTA */}
         <div className="flex justify-center reveal">
-          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="btn-gold">
+          <a href={`https://wa.me/${t("footer.phone").replace(/[^0-9]/g, "") || "97433555918"}`} target="_blank" rel="noopener noreferrer" className="btn-gold">
             {t("why.cta")}
           </a>
         </div>

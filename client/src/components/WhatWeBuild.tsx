@@ -1,59 +1,29 @@
-/* ============================================================
-   AL NOOR TENTS — What We Build Section
-   4 tent type cards with hover image reveal
-   ============================================================ */
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ArrowRight } from "lucide-react";
+import { trpc } from "@/lib/trpc";
 
 const DOME_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/jtD7vMJSJN7HQvsfcDy4th/dome-luxury-3tjemozAA48AZ69g5YjGz9.webp";
 const WEDDING_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/jtD7vMJSJN7HQvsfcDy4th/wedding-luxury-inNzLPNNBCuVMLUPSrXthZ.webp";
 const RAMADAN_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/jtD7vMJSJN7HQvsfcDy4th/ramadan-majlis-MgNdmkbDPGGvPWNjMEEKhF.webp";
 const HERO_IMAGE = "https://d2xsxph8kpxj0f.cloudfront.net/310519663716628401/jtD7vMJSJN7HQvsfcDy4th/hero-main-5xCAP7fo2MqgtdUHktAwG6.webp";
 
-import { trpc } from "@/lib/trpc";
+const defaultTents = [
+  { id: "arch-tents", titleEn: "ARCH TENTS", titleAr: "خيام القوس", descEn: "Minimal footprint, maximum impact.", descAr: "بصمة بسيطة، تأثير أقصى.", image: HERO_IMAGE },
+  { id: "dome-tents", titleEn: "DOME TENTS", titleAr: "خيام القبة", descEn: "Geometric beauty for immersive events.", descAr: "جمال هندسي لفعاليات غامرة.", image: DOME_IMAGE },
+  { id: "wedding-tents", titleEn: "WEDDING TENTS", titleAr: "خيام الأفراح", descEn: "Unforgettable venues for your special day.", descAr: "أماكن لا تُنسى ليومك الخاص.", image: WEDDING_IMAGE },
+  { id: "ramadan-tents", titleEn: "RAMADAN TENTS", titleAr: "خيام رمضان", descEn: "Authentic majlis spaces for cultural gatherings.", descAr: "مجالس أصيلة للتجمعات الثقافية.", image: RAMADAN_IMAGE },
+];
 
 export default function WhatWeBuild() {
   const { t, lang } = useLanguage();
   const { data: cms } = trpc.admin.content.get.useQuery({ sectionKey: "what-we-build" });
+  const { data: products = [] } = trpc.admin.products.list.useQuery();
 
-  let tents = [
-    {
-      id: "arch-tents",
-      titleKey: "build.arch.title",
-      descKey: "build.arch.desc",
-      image: HERO_IMAGE,
-    },
-    {
-      id: "dome-tents",
-      titleKey: "build.dome.title",
-      descKey: "build.dome.desc",
-      image: DOME_IMAGE,
-    },
-    {
-      id: "wedding-tents",
-      titleKey: "build.wedding.title",
-      descKey: "build.wedding.desc",
-      image: WEDDING_IMAGE,
-    },
-    {
-      id: "ramadan-tents",
-      titleKey: "build.ramadan.title",
-      descKey: "build.ramadan.desc",
-      image: RAMADAN_IMAGE,
-    },
-  ];
+  const sectionLabel = lang === "ar" ? (cms?.contentAr || t("build.label")) : (cms?.contentEn || t("build.label"));
 
-  if (cms?.contentEn) {
-    try {
-      const parsed = JSON.parse(cms.contentEn);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        tents = parsed.map((p, i) => ({
-          ...tents[i],
-          ...p,
-        }));
-      }
-    } catch(e) {}
-  }
+  const tents = products.length > 0
+    ? products.filter(p => p.isVisible !== false).sort((a, b) => (a.order || 0) - (b.order || 0))
+    : defaultTents;
 
   return (
     <section
@@ -62,9 +32,8 @@ export default function WhatWeBuild() {
       style={{ background: "oklch(0.10 0.012 60)" }}
     >
       <div className="container">
-        {/* Section header */}
         <div className="mb-16 reveal">
-          <div className="section-label">{t("build.label")}</div>
+          <div className="section-label">{sectionLabel}</div>
           <h2
             className="text-white mb-4"
             style={{
@@ -91,15 +60,14 @@ export default function WhatWeBuild() {
           </p>
         </div>
 
-        {/* Tent cards grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {tents.map((tent: any, i) => (
             <TentCard
-              key={tent.id}
-              id={tent.id}
-              title={tent.title || t(tent.titleKey)}
-              desc={tent.desc || t(tent.descKey)}
-              image={tent.image}
+              key={tent.id || i}
+              id={tent.id || `tent-${i}`}
+              title={lang === "ar" ? (tent.titleAr || tent.titleEn) : tent.titleEn}
+              desc={lang === "ar" ? (tent.descAr || tent.descEn) : tent.descEn}
+              image={tent.imageUrl || tent.image}
               index={i}
               lang={lang}
             />
@@ -110,15 +78,8 @@ export default function WhatWeBuild() {
   );
 }
 
-function TentCard({
-  id, title, desc, image, index, lang
-}: {
-  id: string;
-  title: string;
-  desc: string;
-  image: string;
-  index: number;
-  lang: string;
+function TentCard({ id, title, desc, image, index, lang }: {
+  id: string; title: string; desc: string; image: string; index: number; lang: string;
 }) {
   return (
     <div
@@ -129,13 +90,11 @@ function TentCard({
         transitionDelay: `${index * 100}ms`,
       }}
     >
-      {/* Background image */}
       <div
         className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-105"
         style={{ backgroundImage: `url(${image})` }}
       />
 
-      {/* Overlay */}
       <div
         className="absolute inset-0 transition-all duration-500"
         style={{
@@ -143,7 +102,6 @@ function TentCard({
         }}
       />
 
-      {/* Gold top border on hover */}
       <div
         className="absolute top-0 left-0 right-0 h-0.5 transition-all duration-500"
         style={{
@@ -154,7 +112,6 @@ function TentCard({
         onMouseEnter={(e) => (e.currentTarget.style.transform = "scaleX(1)")}
       />
 
-      {/* Content */}
       <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
         <h3
           className="text-white mb-2 transition-transform duration-300 group-hover:-translate-y-1"

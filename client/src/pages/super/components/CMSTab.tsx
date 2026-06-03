@@ -122,24 +122,36 @@ function CMSForm({ sectionKey, title }: { sectionKey: string, title: string }) {
           </div>
 
           <div className="pt-4 border-t border-slate-800 space-y-4">
-            <h4 className="text-sm font-semibold text-white">Extra Content</h4>
+            <h4 className="text-sm font-semibold text-white">Bilingual Content</h4>
+            <p className="text-xs text-slate-500">
+              {sectionKey === "hero" && "This content appears below the main title and subtitle."}
+              {sectionKey === "what-we-build" && "Section label text (e.g. 'Our Products' / 'منتجاتنا')."}
+              {sectionKey === "why-choose-us" && "Section label text (e.g. 'Why Al Noor' / 'لماذا آل نور')."}
+              {sectionKey === "stats" && "Section label text (e.g. 'Our Numbers' / 'أرقامنا')."}
+              {sectionKey === "projects" && "Section label text (e.g. 'Our Work' / 'أعمالنا')."}
+              {sectionKey === "clients" && "Section label text (e.g. 'Our Clients' / 'عملاؤنا')."}
+              {sectionKey === "contact" && "Section label text (e.g. 'Get In Touch' / 'تواصل معنا')."}
+              {sectionKey === "footer" && "Tagline or extra footer text displayed below the brand name."}
+              {sectionKey === "marquee" && "Comma-separated items that scroll across the gold bar."}
+              {!["hero","what-we-build","why-choose-us","stats","projects","clients","contact","footer","marquee"].includes(sectionKey) && "Extra text content for this section — displayed per design."}
+            </p>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">English Content</label>
+              <label className="text-sm font-medium text-slate-300">English</label>
               <Textarea
                 value={formData.contentEn}
                 onChange={(e) => setFormData({ ...formData, contentEn: e.target.value })}
                 className="bg-slate-950 border-slate-800 h-32 font-mono text-sm"
-                placeholder="English version — JSON arrays, bullet points, or comma-separated values"
+                placeholder="English version"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-300">Arabic Content (محتوى عربي)</label>
+              <label className="text-sm font-medium text-slate-300">Arabic (العربية)</label>
               <Textarea
                 value={formData.contentAr}
                 onChange={(e) => setFormData({ ...formData, contentAr: e.target.value })}
                 className="bg-slate-950 border-slate-800 h-32 font-mono text-sm"
                 dir="rtl"
-                placeholder="النسخة العربية — مصفوفات JSON أو نقاط أو قيم مفصولة بفواصل"
+                placeholder="النسخة العربية"
               />
             </div>
           </div>
